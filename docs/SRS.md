@@ -7,7 +7,7 @@
 | **Document** | Software Requirements Specification (SRS), Version 1.0 |
 | **Date** | 3 November 2026 |
 | **Type** | College-level, individual full-stack project |
-| **Prepared by** | [Your Name] · [Roll No.] · [Institution] |
+<!-- | **Prepared by** | [Your Name] · [Roll No.] · [Institution] | -->
 
 **Contents:** 1 Introduction · 2 Technology Stack · 3 Functional Requirements · 4 System Architecture · 5 Database Design · 6 Technical Workflows · 7 Redis and Background Processing · 8 Real-Time Communication · 9 AI Content Moderation · 10 API Documentation · 11 Security · 12 UI/UX · 13 Non-Functional Requirements · 14 Day-wise Plan · 15 Testing · 16 Deployment · 17 Assumptions and Future Scope · Appendix A Quality Verification · Appendix B Detailed API Examples
 <!--pdf:end-->
@@ -49,16 +49,16 @@ Every technology below is used consistently throughout this document.
 | Backend | Node.js + Express.js | Runs the JavaScript server and defines REST API routes and middleware. |
 | Backend | Prisma ORM | Type-safe database access and migrations; protects against SQL injection by using parameters. |
 | Backend | Zod | Checks that incoming data (body, query, params) has the correct shape before it is used. |
-| Data | PostgreSQL | Main relational database. Stores all permanent data (source of truth). |
+| Data | MongoDB | Main non-relational database. Stores all permanent data (source of truth). |
 | Data | Redis | Very fast in-memory store for feeds, counters, rate limits, queues and real-time messaging. |
-| Infra | Docker | Runs PostgreSQL and Redis (and optionally the apps) identically on every computer. |
+| Infra | Docker | Runs MongoDB and Redis (and optionally the apps) identically on every computer. |
 | Infra | BullMQ | Job queue on top of Redis for background work: fan-out, notifications, moderation, trending. |
 | Infra | Socket.IO | Two-way real-time connection for live counts and instant notifications. |
 | External | Cloudinary | Stores and serves uploaded images (avatars, post images) through a CDN. |
 | External | Google Gemini API | AI model that reads new posts and reports whether they may break community rules. |
 | Deployment | Vercel | Hosts the built React app. |
 | Deployment | Render or Railway | Hosts the Express API and the worker process. |
-| Deployment | Managed PostgreSQL / Redis | Hosted databases with backups, so no server maintenance is needed. |
+| Deployment | Managed MongoDB / Redis | Hosted databases with backups, so no server maintenance is needed. |
 | Supporting | bcrypt, jsonwebtoken, Helmet, cors, Multer, Pino, Vitest, Supertest, Playwright | Password hashing, tokens, secure headers, cross-origin rules, file uploads, logging, unit/integration tests, end-to-end tests. |
 
 ## 3. Functional Requirements

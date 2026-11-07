@@ -30,8 +30,8 @@ Engineering principles, in priority order:
 | Layer | Technology |
 |---|---|
 | Frontend | React 18, TypeScript (strict), Vite, Tailwind CSS 3, React Router 6 |
-| Backend *(planned)* | Node.js 20, Express or NestJS, TypeScript, Zod validation |
-| Database *(planned)* | PostgreSQL 16 with Prisma or Drizzle |
+| Backend *(planned)* | Node.js 20, Express JS, TypeScript, Zod validation |
+| Database *(planned)* | MongoDB |
 | Cache and queues *(planned)* | Redis 7 (Docker), BullMQ |
 | Real time *(planned)* | Socket.io |
 | Media *(planned)* | S3 or Cloudinary |

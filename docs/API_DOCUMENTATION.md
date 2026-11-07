@@ -1,5 +1,5 @@
 
-# ConnectX API Reference
+# Chripewell API Reference
 
 **Version:** 1.0  
 **Status:** Proposed API Contract  

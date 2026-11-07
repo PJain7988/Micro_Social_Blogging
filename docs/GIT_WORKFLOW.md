@@ -1,6 +1,6 @@
 
 # Micro Social Blogging – Git Workflow Documentation
-
+**Title** Chripwell
 **Version:** 1.0  
 **Version Control:** Git  
 **Repository:** GitHub  

@@ -1,6 +1,6 @@
 
 # Database Schema Documentation
-
+**Title** Chripwell
 **Version:** 1.0  
 **Database:** MongoDB  
 **ODM:** Mongoose  
@@ -12,7 +12,7 @@
 
 ## 1. Introduction
 
-This document defines the database architecture and schema design for ConnectX using MongoDB and Mongoose.
+This document defines the database architecture and schema design for Chripwell (Blogging platform) using MongoDB and Mongoose.
 
 The database design is based on the functional requirements defined in the ConnectX SRS.
 
