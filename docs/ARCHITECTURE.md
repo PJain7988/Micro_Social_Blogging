@@ -2,9 +2,9 @@
 
 ## 1. Overview
 
-The system has four running parts: a **React web app**, a **REST API** with a **Socket.IO** server, a **background worker**, and two data stores, **PostgreSQL** and **Redis**.
+The system has four running parts: a **React web app**, a **REST API** with a **Socket.IO** server, a **background worker**, and two data stores, **MongoDB** and **Redis**.
 
-PostgreSQL is the source of truth. Redis is only a speed layer (feeds, counters, queues, cache), so anything in Redis can be rebuilt from PostgreSQL.
+MongoDB is the source of truth. Redis is only a speed layer (feeds, counters, queues, cache), so anything in Redis can be rebuilt from MongoDB.
 
 ## 2. Architecture Diagram
 
@@ -17,7 +17,7 @@ flowchart LR
     WK[Worker - BullMQ]
   end
   subgraph Data[Data stores]
-    PG[(PostgreSQL)]
+    M[(MongoDB)]
     R[(Redis)]
     IMG[(Image Storage)]
   end
@@ -45,7 +45,7 @@ flowchart LR
 | REST API | Node.js + Express + Zod | Auth, posts, follows, feed, search; validates every request |
 | Socket.IO server | Socket.IO | Pushes live like/repost counts and notifications |
 | Worker | BullMQ | Slow jobs: feed fan-out, trending, AI moderation |
-| Database | PostgreSQL + Prisma | Permanent data (users, posts, follows, likes, ...) |
+| Database | MongoDB + Mongoose | Permanent data (users, posts, follows, likes, ...) |
 | Redis | Redis (Docker) + ioredis | Home feeds, rate-limit counters, trending cache, job queues |
 | Image storage | Cloudinary / R2 | Avatars and post images |
 | LLM provider | Any LLM behind an adapter | Checks post text for abuse |
@@ -57,7 +57,7 @@ flowchart LR
 ```mermaid
 flowchart LR
   A[Browser: POST /posts] --> B[API checks login, rate limit, input]
-  B --> C[Save post in PostgreSQL]
+  B --> C[Save post in MongoDB]
   C --> D[Queue 2 jobs: fan-out + moderation]
   D --> E[Reply 201 to the user]
   D --> F[Worker runs jobs in background]
@@ -67,14 +67,14 @@ The user gets a reply as soon as the post is saved. Slow work happens afterwards
 
 ### 4.2 Fast home feed (fan-out on write)
 
-When a user posts, the worker copies the post ID into every follower's Redis feed (`feed:{userId}`, a sorted set capped at 800 IDs). When a follower opens Home, the API reads the ID list from Redis, loads those posts from PostgreSQL in one query, and returns 20 at a time. Only IDs are stored in Redis, so deletes and count changes always stay correct.
+When a user posts, the worker copies the post ID into every follower's Redis feed (`feed:{userId}`, a sorted set capped at 800 IDs). When a follower opens Home, the API reads the ID list from Redis, loads those posts from MongoDB in one query, and returns 20 at a time. Only IDs are stored in Redis, so deletes and count changes always stay correct.
 
 ```mermaid
 sequenceDiagram
   participant A as API
   participant Q as BullMQ
   participant W as Worker
-  participant D as PostgreSQL
+  participant D as MongoDB
   participant R as Redis
   A->>Q: enqueue fanout(postId)
   Q->>W: deliver job
@@ -85,7 +85,7 @@ sequenceDiagram
 
 **Cursor pagination.** The client sends the last post ID it saw (`cursor`) and gets posts older than it. New posts never shift the pages.
 
-**If Redis is down**, the API builds the feed from PostgreSQL instead (slower, still correct).
+**If Redis is down**, the API builds the feed from MongoDB instead (slower, still correct).
 
 ### 4.3 Real-time updates
 
@@ -144,6 +144,6 @@ Posts are published first and hidden only if flagged, so the LLM never slows or 
 |---|---|
 | Web app | Vercel or Netlify |
 | API + worker | Render, Railway or Fly.io |
-| PostgreSQL | Neon or Supabase |
+| MongoDB | Neon or Supabase |
 | Redis | Upstash or Render |
-| Local development | docker-compose runs PostgreSQL and Redis |
+| Local development | docker-compose runs MongoDB and Redis |
