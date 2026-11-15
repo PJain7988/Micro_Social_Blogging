@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-paper: 245 247 251;       /* Clean cool slate-white */
+    --color-surface: 255 255 255;     /* Pure surface card */
+    --color-ink: 15 23 42;            /* Slate 900 typography */
+    --color-mute: 100 116 139;        /* Slate 500 secondary */
+    --color-line: 226 232 240;        /* Slate 200 border */
+    --color-accent: 37 99 235;        /* Blue 600 vibrant primary */
+    --color-accent-soft: 239 246 255; /* Blue 50 wash */
+    --color-danger: 225 29 72;        /* Rose 600 */
+    --color-success: 16 185 129;      /* Emerald 500 */
+  }
+
+  .dark {
+    --color-paper: 11 15 25;          /* Rich deep obsidian */
+    --color-surface: 19 26 42;        /* Slate 900 elevated surface */
+    --color-ink: 248 250 252;         /* Slate 50 crisp high-contrast */
+    --color-mute: 148 163 184;        /* Slate 400 */
+    --color-line: 33 44 67;           /* Slate 800 subtle division */
+    --color-accent: 59 130 246;       /* Blue 500 luminous */
+    --color-accent-soft: 30 45 77;    /* Subtle blue wash in dark */
+    --color-danger: 244 63 94;        /* Rose 500 */
+    --color-success: 52 211 153;      /* Emerald 400 */
+  }
+
+  body {
+    background-color: rgb(var(--color-paper));
+    color: rgb(var(--color-ink));
+    font-family: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(var(--color-surface), 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Micro-interaction animations */
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.32); }
+  65% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart-pulse {
+  animation: heartPulse 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-line));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--color-mute));
+}

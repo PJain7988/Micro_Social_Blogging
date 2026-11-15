@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # MongoDB primary database (Source of Truth)
+  mongodb:
+    image: mongo:7.0
+    container_name: chirpwell-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: chirpwell
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 7 (In-memory Speed Layer for Fan-out Feeds, Rate Limiting & Pub/Sub)
+  redis:
+    image: redis:7.2-alpine
+    container_name: chirpwell-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend REST API + Socket.IO Server (Member 2 Service)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chirpwell-backend
+    restart: on-failure
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/chirpwell
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: super_secret_jwt_token_chirpwell_dev_key_2026
+      JWT_REFRESH_SECRET: super_secret_refresh_token_chirpwell_dev_key_2026
+      CLIENT_URL: http://localhost:5173
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend Web Client (React + Vite + Tailwind)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chirpwell-frontend
+    restart: on-failure
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:5000/api/v1
+      VITE_SOCKET_URL: http://localhost:5000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: chirpwell-network

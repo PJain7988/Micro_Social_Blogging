@@ -1,4 +1,4 @@
-# Contributing to Pulse
+# Contributing to Chirpwell
 
 ## Development Rules
 
