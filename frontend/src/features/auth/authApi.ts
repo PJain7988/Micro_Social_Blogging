@@ -1,31 +1,33 @@
 const API_BASE_URL: string =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5000/api/v1";
 
-type ErrorBody = { code?: string; message?: string; details?: unknown };
-type Envelope<T> = { success?: boolean; data?: T; error?: ErrorBody };
+type FieldErrors = Record<string, string>;
+
+type Envelope<T> = {
+  success?: boolean;
+  message?: string;
+  data?: T;
+  errors?: Record<string, string[] | undefined>;
+};
 
 export class ApiError extends Error {
   status: number;
-  code: string;
-  fields: Record<string, string>;
+  fields: FieldErrors;
 
-  constructor(message: string, status: number, code: string, fields: Record<string, string> = {}) {
+  constructor(message: string, status: number, fields: FieldErrors = {}) {
     super(message);
     this.status = status;
-    this.code = code;
     this.fields = fields;
   }
 }
 
-// Assumes error.details looks like [{ field, message }]. Confirm with Member 2.
-function toFieldErrors(details: unknown): Record<string, string> {
-  const out: Record<string, string> = {};
-  if (!Array.isArray(details)) return out;
-  for (const d of details) {
-    if (d && typeof d === "object") {
-      const { field, message } = d as { field?: unknown; message?: unknown };
-      if (typeof field === "string" && typeof message === "string") out[field] = message;
-    }
+// The backend sends validation errors as { fieldName: ["message", ...] }.
+// We show the first message for each field.
+function toFieldErrors(errors: Envelope<unknown>["errors"]): FieldErrors {
+  const out: FieldErrors = {};
+  if (!errors) return out;
+  for (const [field, messages] of Object.entries(errors)) {
+    if (messages && messages.length > 0) out[field] = messages[0];
   }
   return out;
 }
@@ -40,7 +42,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
       body: JSON.stringify(body),
     });
   } catch {
-    throw new ApiError("Cannot reach the server. Check your connection and try again.", 0, "NETWORK_ERROR");
+    throw new ApiError("Cannot reach the server. Check your connection and try again.", 0);
   }
 
   let json: Envelope<T> | null = null;
@@ -51,36 +53,35 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   }
 
   if (!res.ok || json?.success === false) {
-    const err = json?.error;
-    const code = err?.code ?? "UNKNOWN";
-    const message =
-      code === "RATE_LIMITED"
-        ? "Too many attempts. Please wait a few minutes and try again."
-        : err?.message ?? "Something went wrong. Please try again.";
-    throw new ApiError(message, res.status, code, toFieldErrors(err?.details));
+    throw new ApiError(
+      json?.message ?? "Something went wrong. Please try again.",
+      res.status,
+      toFieldErrors(json?.errors)
+    );
   }
   return json?.data as T;
 }
 
+type AuthResult = { accessToken: string };
+
 export type RegisterInput = {
-  email: string;
   username: string;
-  password: string;
+  email: string;
   displayName: string;
+  password: string;
+  confirmPassword: string;
 };
 
-export function register(input: RegisterInput) {
-  return post<unknown>("/auth/register", input);
+// Register also logs the user in: the backend returns an access token.
+export async function register(input: RegisterInput): Promise<string> {
+  const data = await post<AuthResult>("/auth/register", input);
+  return data.accessToken;
 }
 
-type LoginData = { accessToken?: string; token?: string; access_token?: string };
-
-// TODO: the API doc does not name the token field. Confirm with Member 2.
-export async function login(email: string, password: string): Promise<string> {
-  const data = await post<LoginData>("/auth/login", { email, password });
-  const token = data?.accessToken ?? data?.token ?? data?.access_token;
-  if (!token) throw new ApiError("Login succeeded but no access token was returned.", 200, "NO_TOKEN");
-  return token;
+// "identifier" can be an email or a username.
+export async function login(identifier: string, password: string): Promise<string> {
+  const data = await post<AuthResult>("/auth/login", { identifier, password });
+  return data.accessToken;
 }
 
 export function saveToken(token: string, remember: boolean) {
