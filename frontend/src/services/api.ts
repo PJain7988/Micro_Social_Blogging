@@ -35,7 +35,7 @@ class ApiClient {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const savedToken = localStorage.getItem('pulse_auth_token');
+      const savedToken = localStorage.getItem('chirpwell_auth_token');
       if (savedToken) {
         this.token = savedToken;
       }
@@ -45,9 +45,9 @@ class ApiClient {
   public setToken(token: string | null) {
     this.token = token;
     if (token) {
-      localStorage.setItem('pulse_auth_token', token);
+      localStorage.setItem('chirpwell_auth_token', token);
     } else {
-      localStorage.removeItem('pulse_auth_token');
+      localStorage.removeItem('chirpwell_auth_token');
     }
   }
 
@@ -429,14 +429,14 @@ class ApiClient {
   }
 
   public getCurrentMockUser(): User {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('pulse_current_username') : null;
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('chirpwell_current_username') : null;
     return this.users[saved || 'sarah_tech'] || this.users.sarah_tech;
   }
 
   public switchMockUser(username: string): User {
     if (this.users[username]) {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('pulse_current_username', username);
+        localStorage.setItem('chirpwell_current_username', username);
       }
       return this.users[username];
     }

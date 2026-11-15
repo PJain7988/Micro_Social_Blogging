@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pulse_theme_mode') as ThemeMode;
+      const saved = localStorage.getItem('chirpwell_theme_mode') as ThemeMode;
       if (saved) return saved;
     }
     return 'system';
@@ -44,7 +44,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     applyTheme();
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem('pulse_theme_mode', theme);
+      localStorage.setItem('chirpwell_theme_mode', theme);
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const listener = () => {
         if (theme === 'system') applyTheme();
