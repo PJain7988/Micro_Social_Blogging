@@ -137,8 +137,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenComposeModal }) => {
           </div>
         </div>
 
-        {/* User Card */}
-        {currentUser && (
+        {/* User Card or Sign In / Sign Up CTA */}
+        {currentUser ? (
           <div className="flex items-center justify-between p-2 rounded-xl hover:bg-paper transition-colors group">
             <div
               className="flex items-center space-x-3 cursor-pointer overflow-hidden"
@@ -153,13 +153,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenComposeModal }) => {
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
               className="p-1.5 text-mute hover:text-danger rounded-full transition-colors"
               title="Log out"
               aria-label="Log out"
             >
               <LogOut size={18} />
             </button>
+          </div>
+        ) : (
+          <div className="space-y-2 pt-2 border-t border-line">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className="w-full font-bold justify-center"
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/register')}
+              className="w-full font-bold justify-center border-line hover:bg-paper"
+            >
+              Sign Up
+            </Button>
           </div>
         )}
       </div>

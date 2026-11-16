@@ -14,7 +14,13 @@ export const MobileHeader: React.FC = () => {
     <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2.5 bg-surface/90 backdrop-blur-md border-b border-line md:hidden">
       <div
         className="cursor-pointer"
-        onClick={() => currentUser && navigate(`/u/${currentUser.username}`)}
+        onClick={() => {
+          if (currentUser) {
+            navigate(`/u/${currentUser.username}`);
+          } else {
+            navigate('/login');
+          }
+        }}
       >
         <Avatar src={currentUser?.avatar} alt={currentUser?.displayName || 'User'} size="sm" />
       </div>
