@@ -1,13 +1,30 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { Sidebar } from './Sidebar';
 import { MobileHeader, MobileBottomNav } from './Navbar';
 import { RightPanel } from './RightPanel';
 import { Modal } from '../ui/Modal';
 import { PostComposer } from '../post/PostComposer';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
 
 export const AppLayout: React.FC = () => {
+  const { currentUser, isLoading } = useAuth();
+  const location = useLocation();
   const [isComposeModalOpen, setIsComposeModalOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-paper flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // If not logged in, redirect to register/sign up page
+  if (!currentUser) {
+    return <Navigate to="/register" state={{ from: location }} replace />;
+  }
 
   return (
     <div className="min-h-screen bg-paper flex justify-center selection:bg-accentSoft selection:text-accent">

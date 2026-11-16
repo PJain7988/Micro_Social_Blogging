@@ -23,7 +23,7 @@ export interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onOpenComposeModal }) => {
-  const { currentUser, logout, switchDemoUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
   const navItems = [
@@ -97,46 +97,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenComposeModal }) => {
       </div>
 
       {/* User Card & Demo Switcher Footer */}
+      {/* Bottom User Area */}
       <div className="space-y-3 pt-4 border-t border-line">
-        {/* Quick Demo Switcher */}
-        <div className="bg-paper p-2.5 rounded-xl border border-line">
-          <p className="text-[11px] font-bold text-mute uppercase tracking-wider mb-1.5 px-1">
-            Demo Account Switcher
-          </p>
-          <div className="grid grid-cols-3 gap-1">
-            <button
-              onClick={() => switchDemoUser('sarah_tech')}
-              className={cn(
-                'px-1.5 py-1 text-[11px] font-semibold rounded truncate',
-                currentUser?.username === 'sarah_tech' ? 'bg-accent text-white' : 'bg-surface text-ink hover:bg-slate-200'
-              )}
-              title="Sarah Connor (Eng Lead)"
-            >
-              Sarah
-            </button>
-            <button
-              onClick={() => switchDemoUser('alex_dev')}
-              className={cn(
-                'px-1.5 py-1 text-[11px] font-semibold rounded truncate',
-                currentUser?.username === 'alex_dev' ? 'bg-accent text-white' : 'bg-surface text-ink hover:bg-slate-200'
-              )}
-              title="Alex (Private Account)"
-            >
-              Alex (Priv)
-            </button>
-            <button
-              onClick={() => switchDemoUser('moderator_admin')}
-              className={cn(
-                'px-1.5 py-1 text-[11px] font-semibold rounded truncate',
-                currentUser?.username === 'moderator_admin' ? 'bg-accent text-white' : 'bg-surface text-ink hover:bg-slate-200'
-              )}
-              title="Moderator Admin"
-            >
-              Mod
-            </button>
-          </div>
-        </div>
-
         {/* User Card or Sign In / Sign Up CTA */}
         {currentUser ? (
           <div className="flex items-center justify-between p-2 rounded-xl hover:bg-paper transition-colors group">

@@ -20,9 +20,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Initialize user session
-    const user = api.getCurrentMockUser();
-    setCurrentUser(user);
+    // Check if user previously logged in
+    const token = typeof window !== 'undefined' ? localStorage.getItem('chirpwell_auth_token') : null;
+    const savedUser = typeof window !== 'undefined' ? localStorage.getItem('chirpwell_current_username') : null;
+    if (token && savedUser) {
+      const user = api.getCurrentMockUser();
+      setCurrentUser(user);
+    } else {
+      setCurrentUser(null);
+    }
     setIsLoading(false);
   }, []);
 
@@ -64,6 +70,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     api.setToken(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('chirpwell_current_username');
+    }
     setCurrentUser(null);
   };
 
