@@ -18,7 +18,9 @@ export const FollowRequestsPage: React.FC = () => {
     setIsLoading(true);
     try {
       const list = await api.getFollowRequests();
-      setRequests(list);
+      setRequests(Array.isArray(list) ? list : []);
+    } catch {
+      setRequests([]);
     } finally {
       setIsLoading(false);
     }

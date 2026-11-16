@@ -15,11 +15,18 @@ export const ExplorePage: React.FC = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    Promise.all([api.getTrendingTopics(), api.getFeed()]).then(([tags, feed]) => {
-      setTrending(tags);
-      setTopPosts(feed.data);
-      setIsLoading(false);
-    });
+    Promise.all([api.getTrendingTopics(), api.getFeed()])
+      .then(([tags, feed]) => {
+        setTrending(Array.isArray(tags) ? tags : []);
+        setTopPosts(Array.isArray(feed?.data) ? feed.data : []);
+      })
+      .catch(() => {
+        setTrending([]);
+        setTopPosts([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {

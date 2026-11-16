@@ -280,15 +280,29 @@ class ApiClient {
       }
     }
 
-    // Users
-    if (endpoint.startsWith('/users/')) {
-      const username = endpoint.split('/users/')[1].split('/')[0];
-      if (this.users[username]) {
-        return this.users[username];
+    // Follow Requests
+    if (endpoint === '/users/requests') {
+      return this.followRequests.filter(r => r.status === 'pending');
+    }
+
+    if (endpoint.includes('/requests/') && endpoint.includes('/approve')) {
+      const reqId = endpoint.split('/requests/')[1].split('/approve')[0];
+      const req = this.followRequests.find(r => r.id === reqId);
+      if (req) {
+        req.status = 'accepted';
+        req.requester.isFollowing = true;
+        this.getCurrentMockUser().followersCount += 1;
+        return { success: true };
       }
-      const byId = Object.values(this.users).find(u => u.id === username || u.username === username);
-      if (byId) return byId;
-      return this.users.sarah_tech;
+    }
+
+    if (endpoint.includes('/requests/') && endpoint.includes('/reject')) {
+      const reqId = endpoint.split('/requests/')[1].split('/reject')[0];
+      const req = this.followRequests.find(r => r.id === reqId);
+      if (req) {
+        req.status = 'rejected';
+        return { success: true };
+      }
     }
 
     // Follow / Unfollow
@@ -328,29 +342,15 @@ class ApiClient {
       }
     }
 
-    // Follow Requests
-    if (endpoint === '/users/requests') {
-      return this.followRequests.filter(r => r.status === 'pending');
-    }
-
-    if (endpoint.includes('/requests/') && endpoint.includes('/approve')) {
-      const reqId = endpoint.split('/requests/')[1].split('/approve')[0];
-      const req = this.followRequests.find(r => r.id === reqId);
-      if (req) {
-        req.status = 'accepted';
-        req.requester.isFollowing = true;
-        this.getCurrentMockUser().followersCount += 1;
-        return { success: true };
+    // Users (must come after specific /users/requests and /users/:id/follow routes)
+    if (endpoint.startsWith('/users/')) {
+      const username = endpoint.split('/users/')[1].split('/')[0];
+      if (this.users[username]) {
+        return this.users[username];
       }
-    }
-
-    if (endpoint.includes('/requests/') && endpoint.includes('/reject')) {
-      const reqId = endpoint.split('/requests/')[1].split('/reject')[0];
-      const req = this.followRequests.find(r => r.id === reqId);
-      if (req) {
-        req.status = 'rejected';
-        return { success: true };
-      }
+      const byId = Object.values(this.users).find(u => u.id === username || u.username === username);
+      if (byId) return byId;
+      return this.users.sarah_tech;
     }
 
 

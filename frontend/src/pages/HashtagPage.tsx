@@ -17,10 +17,16 @@ export const HashtagPage: React.FC = () => {
   useEffect(() => {
     if (!tag) return;
     setIsLoading(true);
-    api.getPostsByTag(tag).then((res) => {
-      setPosts(res);
-      setIsLoading(false);
-    });
+    api.getPostsByTag(tag)
+      .then((res) => {
+        setPosts(Array.isArray(res) ? res : []);
+      })
+      .catch(() => {
+        setPosts([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [tag]);
 
   return (

@@ -20,7 +20,9 @@ export const NotificationsPage: React.FC = () => {
     setIsLoading(true);
     try {
       const list = await api.getNotifications();
-      setNotifications(list);
+      setNotifications(Array.isArray(list) ? list : []);
+    } catch {
+      setNotifications([]);
     } finally {
       setIsLoading(false);
     }

@@ -18,7 +18,9 @@ export const ModerationPage: React.FC = () => {
     setIsLoading(true);
     try {
       const items = await api.getModerationQueue();
-      setQueue(items.filter((item) => item.status === 'FLAGGED'));
+      setQueue(Array.isArray(items) ? items.filter((item) => item.status === 'FLAGGED') : []);
+    } catch {
+      setQueue([]);
     } finally {
       setIsLoading(false);
     }
